@@ -79,18 +79,22 @@
       ;;            )))
       )))
 
-(defpartial tasks-p []
-  [:div.tasks.block
-   (let [tasks (get-in @data [:scene :tasks])]
-     [:ul
-      (map (fn [task]
-             (let [name (task :name)]
-               [:li name]))
-           tasks)])])
+(defpartial tasks-p [tasks]
+  [:ul
+   (map (fn [task]
+          (when (or (task :known?) (task :complete?))
+            (let [name (task :name)]
+              [:li (if (task :complete?)
+                     {:class "complete"}
+                     {})
+               name
+               (tasks-p (task :tasks))])))
+        tasks)])
 
 (defn refresh-tasks []
-  (em/at js/document
-         [".tasks"] (em/substitute (tasks-p))))
+  (let [tasks (get-in @data [:scene :tasks])]
+    (em/at js/document
+           [".tasks"] (em/content (tasks-p tasks)))))
 
 (defn refresh-scene []
   (let [{image :image [width height] :size} (get-in @data [:scene :background])
@@ -98,6 +102,8 @@
         objects (get-in @data [:scene :objects])
         objects (doall (map draw-object objects))
         ]
+    (doto background
+      (.click (fn [_] (info nil))))
     (refresh-tasks)
     ))
 

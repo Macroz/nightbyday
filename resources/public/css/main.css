@@ -22,6 +22,11 @@
     margin: 0;
 }
 
+.tasks ul ul {
+    font-size: 75%;
+    padding-left: 25px;
+}
+
 .info {
     left: 50px;
     top: 50px;
@@ -38,4 +43,9 @@
 
 .show {
     display: block;
+}
+
+.complete {
+    color: #797;
+    text-decoration: line-through;
 }

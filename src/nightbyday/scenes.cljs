@@ -2,14 +2,14 @@
 
 (defn day1 []
   {:background {:image "img/village.png" :size [1920 1080]}
-   :tasks [{:id :investigate :name "Investigate crime scene"
+   :tasks [{:id :investigate :name "Investigate crime scene" :known? true
             :tasks [{:id :examine-body :name "Examine body"}
                     {:id :examine-eyes :name "Examine eyes"}
                     {:id :examine-knife :name "Examine knife"}
                     {:id :examine-footprint :name "Examine footprint"}]}
-           {:id :talk-to-witness :name "Talk to witness"}
-           {:id :talk-to-police :name "Talk to police"}
-           {:id :investigate-victim-home :name "Examine victim's home"}]
+           {:id :talk-to-witness :name "Talk to witness" :known? true}
+           {:id :talk-to-police :name "Talk to police" :known? true}
+           {:id :investigate-victim-home :name "Examine victim's home" :known? true}]
    :objects [{:position [650 600]
               :image "img/body1.png"
               :size [431 255]
