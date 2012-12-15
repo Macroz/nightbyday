@@ -32,9 +32,9 @@
 (def server (atom nil))
 
 (defn- run []
+  (when @server
+    (.stop @server))
   (swap! server (fn [old]
-                  (when old
-                    (.stop old))
                   (run-jetty #'app {:port 8080 :join? false}))))
 
 (defn -main [port]
