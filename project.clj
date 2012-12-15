@@ -11,6 +11,7 @@
                  [cheshire "3.0.0"]
                  ]
   :plugins [[lein-cljsbuild "0.2.7"]]
+  :hooks [leiningen.cljsbuild]
   :cljsbuild {
               :builds [{
                         :source-path "src"
