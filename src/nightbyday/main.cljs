@@ -27,7 +27,7 @@
 
 (defn init-day1 []
   (let [scene {:background {:image "img/village.png" :size [1920 1080]}
-               :tasks [{:id :investigate :name "Investigate murder"
+               :tasks [{:id :investigate :name "Investigate crime scene"
                         :tasks [{:id :examine-body :name "Examine body"}
                                 {:id :examine-eyes :name "Examine eyes"}
                                 {:id :examine-knife :name "Examine knife"}
