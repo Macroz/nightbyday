@@ -25,8 +25,8 @@
 
 (defn startup []
   (let [raphael (.-Raphael js/window)
-        paper (raphael 0 0 1024 768)
-        image (.image paper "img/village.png" 0 0 1024 768)
+        paper (raphael 0 0 1920 1080)
+        image (.image paper "img/village.png" 0 0 1920 1080)
         circle (.circle paper 50 40 10)
         ]
     (doto circle
