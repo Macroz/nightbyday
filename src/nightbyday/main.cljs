@@ -25,13 +25,15 @@
 
 (defn startup []
   (let [raphael (.-Raphael js/window)
-        paper (raphael 10 50 320 200)
-        circle (.circle paper 50 40 10)]
+        paper (raphael 0 0 1024 768)
+        image (.image paper "img/village.png" 0 0 1024 768)
+        circle (.circle paper 50 40 10)
+        ]
     (doto circle
-        (.attr "fill" "#f00")
-        (.attr "stroke" "#fff")
-        (.click (fn [&foo] (.attr circle "fill" "#0f0")))
-        )))
+      (.attr "fill" "#f00")
+      (.attr "stroke" "#fff")
+      (.click (fn [&foo] (.attr circle "fill" "#ff0")))
+      )))
 
-;;(defn startup []
+;;(0f0 startup []
 ;;  (goog.Timer/callOnce game-loop 100))
