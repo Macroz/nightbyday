@@ -27,8 +27,13 @@
 
 (def app (-> handler))
 
+(def server (atom nil))
+
 (defn- run []
-  (run-jetty #'app {:port 8080 :join? false}))
+  (swap! server (fn [old]
+                  (when old
+                    (.stop old))
+                  (run-jetty #'app {:port 8080 :join? false}))))
 
 (defn -main [port]
   (run-jetty #'app {:port (Integer. port)}))
