@@ -16,6 +16,18 @@
               :scale 0.2
               :name "Body"
               :description "The body of the victim, a middle-aged man, lies on the edge of the square. The eyes are missing. There is severe bruising in the throat. There is a gaping whole in the stomach. The entrails have spilled out. He is obviously dead."}
+             {:position [705 590]
+              :image "img/eyes1.png"
+              :size [102 57]
+              :scale 0.2
+              :name "Eyes"
+              :description "The eyes of the victim have been dug out and tossed aside."}
+             {:position [690 620]
+              :image "img/blood1.png"
+              :size [102 57]
+              :scale 0.3
+              :name "Guts"
+              :description  "The guts of the victim have spilled out from a gaping wound in his stomach."}
              {:position [1000 620]
               :image "img/man1.png"
               :size [236 438]

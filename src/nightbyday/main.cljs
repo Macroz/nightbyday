@@ -54,27 +54,30 @@
         image (.image @paper image x y w h)
         cx (+ x (/ w 2))
         by (+ y h)
-        text (.text @paper cx by (str x ", " y))]
-    (doto text
-      (.attr "stroke" "#fff")
-      (.attr "fill" "#fff")
-      (.attr "font-size" "20"))
+        ;;text (.text @paper cx by (str x ", " y))
+        ]
+    ;; (doto text
+    ;;   (.attr "stroke" "#fff")
+    ;;   (.attr "fill" "#fff")
+    ;;   (.attr "font-size" "20"))
     (when flip
       (.transform image "s-1,1"))
     (doto image
       (.click (fn [_] (info object)))
-      (.drag (fn [dx dy x y event]
-               (let [cx (+ x (/ w 2))
-                     by (+ y h)]
-                 (when flip
-                   (.transform image "s-1,1"))
-                 (.attr image "x" x)
-                 (.attr image "y" y)
-                 (.attr text "x" cx)
-                 (.attr text "y" by)
-                 (when flip
-                   (.transform image "s-1,1"))
-                 (.attr text "text" (str x ", " y))))))))
+      ;; (.drag (fn [dx dy x y event]
+      ;;          (let [cx (+ x (/ w 2))
+      ;;                by (+ y h)]
+      ;;            (when flip
+      ;;              (.transform image "s-1,1"))
+      ;;            (.attr image "x" x)
+      ;;            (.attr image "y" y)
+      ;;            ;;(.attr text "x" cx)
+      ;;            ;;(.attr text "y" by)
+      ;;            (when flip
+      ;;              (.transform image "s-1,1"))
+      ;;            ;;(.attr text "text" (str x ", " y))
+      ;;            )))
+      )))
 
 (defpartial tasks-p []
   [:div.tasks.block
