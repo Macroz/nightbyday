@@ -21,7 +21,8 @@
            (include-js "js/cljs.js")]
           [:body {:onload "nightbyday.main.startup();"}
            [:canvas#canvas]
-           [:div.tasks]]]))
+           [:div.tasks.block]
+           [:div.info.block]]]))
 
 (defroutes handler
   (GET "/" [] (welcome-page))

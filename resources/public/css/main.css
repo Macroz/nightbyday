@@ -1,12 +1,41 @@
-.tasks {
+.block {
     position: absolute;
-    right: 5%;
-    top: 0;
     z-index: 10;
-    color: #eee;
+    color: #ccc;
     font-size: 2em;
+    border: 1px solid black;
+    padding: 25px;
+    margin: 0;
+    background-color: #555;
+    width: 500px;
+    box-shadow: 5px 5px 10px #000;
+}
+
+.tasks {
+    right: 50px;
+    top: 50px;
 }
 
 .tasks ul {
     list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info {
+    left: 50px;
+    top: 50px;
+    display: none;
+}
+
+.info h1 {
+    font-size: 1em;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.show {
+    display: block;
 }

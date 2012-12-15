@@ -1,6 +1,7 @@
 (ns nightbyday.main
   (:require [enfocus.core :as ef]
             [crate.core :as crate]
+            [nightbyday.scenes :as scenes]
             )
   (:require-macros [enfocus.macros :as em])
   (:use-macros [crate.def-macros :only [defpartial]]))
@@ -26,37 +27,22 @@
 (def paper (atom nil))
 
 (defn init-day1 []
-  (let [scene {:background {:image "img/village.png" :size [1920 1080]}
-               :tasks [{:id :investigate :name "Investigate crime scene"
-                        :tasks [{:id :examine-body :name "Examine body"}
-                                {:id :examine-eyes :name "Examine eyes"}
-                                {:id :examine-knife :name "Examine knife"}
-                                {:id :examine-footprint :name "Examine footprint"}]}
-                       {:id :talk-to-witness :name "Talk to witness"}
-                       {:id :talk-to-police :name "Talk to police"}
-                       {:id :investigate-victim-home :name "Examine victim's home"}]
-               :objects [{:position [650 600]
-                          :image "img/body1.png"
-                          :size [389 277]
-                          :scale 0.2}
-                         {:position [1000 620]
-                          :image "img/person1.png"
-                          :size [202 444]
-                          :flip true
-                          :scale 0.2}
-                         {:position [1130 460]
-                          :image "img/person1.png"
-                          :size [202 444]
-                          :flip true
-                          :scale 0.15}
-                         {:position [500 880]
-                          :image "img/person1.png"
-                          :size [202 444]
-                          :scale 0.3}]}
-        ]
-    (swap! data
-           (fn [data]
-             (assoc data :scene scene)))))
+  (swap! data
+         (fn [data]
+           (assoc data :scene (scenes/day1)))))
+
+(defpartial info-p [object]
+  (if object
+    [:div.info.block
+     [:h1 (get object :name)]
+     [:div (object :description)]]
+    [:div.info]))
+
+(defn info [object]
+  (em/at js/document
+         [".info"] (em/chain
+                    (em/substitute (info-p object))
+                    (em/add-class "show"))))
 
 (defn draw-object [object]
   (let [[x y] (get object :position [100 100])
@@ -65,7 +51,7 @@
         flip (get object :flip false)
         [w h] [(* w scale) (* h scale)]
         image (get object :image "img/default.png")
-        object (.image @paper image x y w h)
+        image (.image @paper image x y w h)
         cx (+ x (/ w 2))
         by (+ y h)
         text (.text @paper cx by (str x ", " y))]
@@ -74,25 +60,24 @@
       (.attr "fill" "#fff")
       (.attr "font-size" "20"))
     (when flip
-      (.transform object "s-1,1"))
-    (doto object
-      ;;(.click (fn [_] (.remove object)))
+      (.transform image "s-1,1"))
+    (doto image
+      (.click (fn [_] (info object)))
       (.drag (fn [dx dy x y event]
                (let [cx (+ x (/ w 2))
                      by (+ y h)]
                  (when flip
-                   (.transform object "s-1,1"))
-                 (.attr object "x" x)
-                 (.attr object "y" y)
+                   (.transform image "s-1,1"))
+                 (.attr image "x" x)
+                 (.attr image "y" y)
                  (.attr text "x" cx)
                  (.attr text "y" by)
                  (when flip
-                   (.transform object "s-1,1"))
-
+                   (.transform image "s-1,1"))
                  (.attr text "text" (str x ", " y))))))))
 
 (defpartial tasks-p []
-  [:div.tasks
+  [:div.tasks.block
    (let [tasks (get-in @data [:scene :tasks])]
      [:ul
       (map (fn [task]
