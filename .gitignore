@@ -9,6 +9,7 @@ target
 .lein-failures
 .lein-plugins
 .lein-cljsbuild*
+cljs.js
 *~
 *jar
 /lib/
