@@ -6,7 +6,8 @@
 
 (defn welcome-page []
   (html5 [:html
-          [:head]
+          [:head
+           [:title "Night By Day"]]
           [:body
            [:h1 "Night By Day"]
            [:a {:href "/game"} "Play"]]]))
@@ -14,6 +15,7 @@
 (defn game-page []
   (html5 [:html
           [:head
+           [:title "Night By Day"]
            (include-js "js/raphael-min.js")
            (include-js "js/cljs.js")]
           [:body {:onload "nightbyday.main.startup();"}

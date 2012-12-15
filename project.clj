@@ -1,6 +1,6 @@
 (defproject nightbyday "0.1.0-SNAPSHOT"
   :description "Night By Day, Ludum Dare #25 game programming competition entry by @zorcam"
-  :url "http://nightbyday.heroku.com"
+  :url "http://nightbyday.herokuapp.com"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.1.0"]
                  [crate "0.2.1"]
