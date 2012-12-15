@@ -16,10 +16,12 @@
   (html5 [:html
           [:head
            [:title "Night By Day"]
+           (include-css "css/main.css")
            (include-js "js/raphael-min.js")
            (include-js "js/cljs.js")]
           [:body {:onload "nightbyday.main.startup();"}
-           [:canvas#canvas]]]))
+           [:canvas#canvas]
+           [:div.tasks]]]))
 
 (defroutes handler
   (GET "/" [] (welcome-page))

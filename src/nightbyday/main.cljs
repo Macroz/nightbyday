@@ -27,6 +27,14 @@
 
 (defn init-day1 []
   (let [scene {:background {:image "img/village.png" :size [1920 1080]}
+               :tasks [{:id :investigate :name "Investigate murder"
+                        :tasks [{:id :examine-body :name "Examine body"}
+                                {:id :examine-eyes :name "Examine eyes"}
+                                {:id :examine-knife :name "Examine knife"}
+                                {:id :examine-footprint :name "Examine footprint"}]}
+                       {:id :talk-to-witness :name "Talk to witness"}
+                       {:id :talk-to-police :name "Talk to police"}
+                       {:id :investigate-victim-home :name "Examine victim's home"}]
                :objects [{:position [650 600]
                           :image "img/body1.png"
                           :size [389 277]
@@ -72,20 +80,37 @@
       (.drag (fn [dx dy x y event]
                (let [cx (+ x (/ w 2))
                      by (+ y h)]
+                 (when flip
+                   (.transform object "s-1,1"))
                  (.attr object "x" x)
                  (.attr object "y" y)
                  (.attr text "x" cx)
                  (.attr text "y" by)
+                 (when flip
+                   (.transform object "s-1,1"))
+
                  (.attr text "text" (str x ", " y))))))))
+
+(defpartial tasks-p []
+  [:div.tasks
+   (let [tasks (get-in @data [:scene :tasks])]
+     [:ul
+      (map (fn [task]
+             (let [name (task :name)]
+               [:li name]))
+           tasks)])])
+
+(defn refresh-tasks []
+  (em/at js/document
+         [".tasks"] (em/substitute (tasks-p))))
 
 (defn refresh-scene []
   (let [{image :image [width height] :size} (get-in @data [:scene :background])
         background (.image @paper image 0 0 width height)
-        _ (log "foo")
         objects (get-in @data [:scene :objects])
         objects (doall (map draw-object objects))
-        _ (log "bar")
         ]
+    (refresh-tasks)
     ))
 
 (defn startup []

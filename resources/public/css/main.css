@@ -1,0 +1,12 @@
+.tasks {
+    position: absolute;
+    right: 5%;
+    top: 0;
+    z-index: 10;
+    color: #eee;
+    font-size: 2em;
+}
+
+.tasks ul {
+    list-style-type: none;
+}
