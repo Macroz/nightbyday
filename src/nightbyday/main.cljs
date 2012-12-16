@@ -31,16 +31,45 @@
 (declare execute-info-action!)
 (declare find-task)
 (declare complete-task!)
+(declare find-same-object-by-id)
+
+(defpartial intro-content-p []
+  [:div.content
+   [:h1 "Introduction"]
+   [:p "It was to be your vacation. Far away from the stressful investigative work, as a detective at the Royal Police Headquarters."]
+   [:p "You arrived to Maple-by-river yesterday evening. It was recommended to you by the Chief Inspector as the most peaceful place on Earth. What a shock would it become. But peace would come one way or another."]
+   [:p "Staying at the Smiling Sloth Inn, you woke up in the morning to the sounds of alarmed noises outside. Deciding to skip breakfast you headed out through the main hall into the village square."]
+   [:p#day1.action "Start your vacation"]])
+
+(defn transition-to-day1! []
+  (em/at js/document
+         [".demo"] (em/chain (em/content (intro-content-p))
+                             (em/fade-out 1000)
+                             ;;(em/remove-class "show")
+                             (init-day1))))
+
+(defn init-intro []
+  (em/at js/document
+         [".demo"] (em/chain (em/content (intro-content-p))
+                             (em/add-class "show"))
+         ["#day1"] (em/listen :click transition-to-day1!)
+         ))
 
 (defn init-day1 []
   (swap! data
          (fn [data]
-           (assoc data :scene (scenes/day1)))))
+           (assoc data :scene (scenes/day1))))
+  (show-action-description! "People are shouting all over the square! You decide to find out what has happened." 5000)
+  (em/at js/document
+         [".tasks"] (em/chain (em/fade-in 1000)
+                              (em/add-class "show")))
+  (refresh-scene))
 
 (defn init-night1 []
   (swap! data
          (fn [data]
-           (assoc data :scene (scenes/night1)))))
+           (assoc data :scene (scenes/night1))))
+  (refresh-scene))
 
 (defn replace-object [old-object new-object objects]
   (loop [done-objects []
@@ -65,10 +94,11 @@
     (let [action (get-in @data [:actions action-id])]
       (action))))
 
-(defn show-action-description! [description]
-  (em/at js/document [".results"] (em/chain (em/content description)
-                                            (em/add-class "show")
-                                            (em/delay 3000 (em/remove-class "show")))))
+(defn show-action-description! [description & timeout]
+  (let [timeout (or (and timeout (first timeout)) 3000)]
+    (em/at js/document [".results"] (em/chain (em/content description)
+                                              (em/add-class "show")
+                                              (em/delay timeout (em/remove-class "show"))))))
 
 (defn add-result! [result]
   (log "Add result " result)
@@ -432,9 +462,7 @@
 
 (defn startup []
   (let [raphael (.-Raphael js/window)
-        new-paper (raphael 0 0 1920 1080)]
+        new-paper (raphael "paper" 1920 1080)]
     (swap! paper (fn [_] new-paper))
-    ;;    (init-day1)
     (swap! data (fn [_] {:results #{}}))
-    (init-night1)
-    (refresh-scene)))
+    (init-intro)))

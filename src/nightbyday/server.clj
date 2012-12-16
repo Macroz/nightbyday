@@ -19,7 +19,7 @@
            [:div.center
             [:div.content
              [:h1 "Night By Day"]
-             [:p "A brutal adventure game entry to " [:a {:href "http://www.ludumdare.com"} "Ludum Dare #25"] ". Not for the faint of heart!"]
+             [:p "A brutal murder mystery game entry to " [:a {:href "http://www.ludumdare.com"} "Ludum Dare #25"] ". Not for the faint of heart!"]
              [:p "By Markku Rontu / markku.rontu@iki.fi / @zorcam"]
              [:div.center
               [:p.play [:a {:href "/game"} "Play"]]]
@@ -35,10 +35,12 @@
            (include-js "js/raphael-min.js")
            (include-js "js/cljs.js")]
           [:body {:onload "nightbyday.main.startup();"}
-           [:canvas#canvas]
-           [:div.tasks.block]
-           [:div.info.block]
-           [:div.results.block]]]))
+           [:div.game
+            [:div#paper]
+            [:div.tasks.block]
+            [:div.info.block]
+            [:div.results.block]]
+           [:div.demo]]]))
 
 (defroutes handler
   (GET "/" [] (welcome-page))
