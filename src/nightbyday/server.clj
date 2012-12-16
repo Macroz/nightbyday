@@ -25,7 +25,16 @@
               [:p.play [:a {:href "/game"} "Play"]]]
              [:div.center
               [:p.screenshots (link-image "img/screenshot1.png")
-               (link-image "img/screenshot2.png")]]]]]]))
+               (link-image "img/screenshot2.png")]]
+             [:p "I enjoyed this second time of participation."]
+             [:p "I wasn't as well prepared as last time, but I had played with the right technology recently."
+              [:ul [:li "ClojureScript was definitely a good choice. There isn't much code. I can make it even less by some refactoring, but there is never time in compos."]
+               [:li "Raphael.js is pretty easy to work with. I could've used some more examples, but that was not a big problem."]
+               [:li "I didn't have time for sounds or music. I was just too lazy :-)"]
+               [:li "Saturday evening with champaign was fun ;-)"]
+               [:li "Concentrating on a short intensive sprint seems like a good way to get things done!"]
+               [:li "I more or less managed to finish the first day of the game (of four days). Game is winnable!"]]]
+             [:p "Thanks, have fun, more to come!"]]]]]))
 
 (defn game-page []
   (html5 [:html
