@@ -76,7 +76,7 @@
               :image "img/man1.png"
               :size [236 438]
               :flip true
-              :scale [0.2 0.27]
+              :scale [0.22 0.27]
               :name "Farmer"
               :description "John Goodfellow is a tall man with a booming voice. He is farmer by profession and lives just next to the village square."}
              {:position [755 540]
