@@ -3,8 +3,9 @@
 (defn day1 []
   {:background {:image "img/village.png" :size [1920 1080]}
    :tasks [{:id :findoutwhathappened :name "Find out what happened" :known? true
-            :tasks [{:id :talk-to-police :name "Talk to police" :known? true}]}
-           {:id :helppolice :name "Help police investigate the murder" :known? false
+            :tasks [{:id :talk-alexthimblewood :name "Talk to the police" :known? true}]
+            :reveal [:helppolice :investigate :talk-to-witness :investigate-victim-home]}
+           {:id :helppolice :name "Help police to investigate the murder" :known? false
             :tasks [{:id :investigate :name "Investigate crime scene" :known? false
                      :tasks [{:id :examine-body :name "Examine body"}
                              {:id :examine-guts :name "Examine guts"}
@@ -58,21 +59,24 @@
               :size [431 255]
               :scale 0.2
               :name "Body"
-              :description "The body of the victim, a middle-aged man, lies on the edge of the square. The eyes are missing. There is severe bruising in the throat. There is a gaping whole in the stomach. The entrails have spilled out. He is obviously dead."}
+              :description "The body of a murder victim lies on the edge of the square."
+              :examine "The body of a middle-aged man. The eyes are missing, having been dug out from their sockets. There is severe bruising in the throat area. There is also a gaping whole in the stomach, from where the guts have spilled out. He is obviously dead."}
              {:id :eyes
               :position [705 590]
               :image "img/eyes1.png"
               :size [102 57]
               :scale 0.2
               :name "Eyes"
-              :description "The eyes of the victim have been dug out and tossed aside."}
+              :description "A pair of presumably human eyes lies in a pool of blood."
+              :examine "The eyes probably belong to the victim. They have been dug out and tossed aside."}
              {:id :guts
               :position [690 620]
               :image "img/blood1.png"
               :size [102 57]
               :scale 0.3
               :name "Guts"
-              :description  "The guts of the victim have spilled out from a gaping wound in his stomach."}
+              :description "The guts of the victim have spilled out from his stomach."
+              :examine "The gaping wound looks like a cut with a blade."}
 
              ;; people
              {:id :johngoodfellow

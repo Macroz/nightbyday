@@ -62,6 +62,9 @@
                                                    (let [new-object (assoc object :talked? true)
                                                          new-objects (replace-object object new-object old-objects)]
                                                      new-objects)))))
+               (when (object :id)
+                 (let [task-id (keyword (str "talk-" (name (object :id))))]
+                   (complete-task! (find-task task-id (get-in @data [:scene :tasks])))))
                (execute-info-action! object)
                )]
     (swap! data (fn [data] (assoc-in data [:actions :talk] talk)))
@@ -76,6 +79,9 @@
                                                       (let [new-object (assoc object :examined? true)
                                                             new-objects (replace-object object new-object old-objects)]
                                                         new-objects)))))
+                  (when (object :id)
+                    (let [task-id (keyword (str "examine-" (name (object :id))))]
+                      (complete-task! (find-task task-id (get-in @data [:scene :tasks])))))
                   (execute-info-action! object)
                   )]
     (swap! data (fn [data] (assoc-in data [:actions :examine] examine)))
@@ -134,6 +140,53 @@
               new-current-task (assoc current-task :tasks current-task-tasks)]
           (recur (conj done-tasks new-current-task) (rest remaining-tasks)))))))
 
+(defn reveal-task! [task-id]
+  (log "Revealing " task-id)
+  (let [tasks (get-in @data [:scene :tasks])
+        task (find-task task-id tasks)
+        new-task (assoc task :known? true)]
+    (swap! data (fn [data]
+                  (update-in data [:scene :tasks]
+                             (fn [tasks]
+                               (replace-task task new-task tasks)))))))
+
+(defn task-subtasks-complete? [task]
+  (let [subtasks (task :tasks)]
+    (or (and subtasks
+             (not (empty? subtasks))
+             (every? identity (map task-subtasks-complete? subtasks)))
+        (task :complete?))))
+
+(declare check-tasks-completion!)
+
+(defn complete-task! [task]
+  (when task
+    (log "Complete task " (task :id))
+    (swap! data (fn [data]
+                  (let [new-task (assoc task :complete? true)
+                        new-tasks (replace-task task new-task (get-in data [:scene :tasks]))]
+                    (assoc-in data [:scene :tasks] new-tasks))))
+    (when (task :reveal)
+      (log "Revealing tasks " (task :reveal))
+      (doall (map reveal-task! (task :reveal))))
+    (check-tasks-completion!)))
+
+(defn check-task-completion! [task]
+  (when-not (task :complete?)
+    (log "Checking task completion " (task :id))
+    (when (and (task :known?)
+               (task-subtasks-complete? task)
+               (not (task :complete?)))
+      (complete-task! task)
+      (when (and (task :tasks) (not (empty? (task :tasks))))
+        (doall (map check-task-completion! (task :tasks))))
+      )))
+
+(defn check-tasks-completion! []
+  (log "Checking all tasks for completion")
+  (let [tasks (get-in @data [:scene :tasks])]
+    (doall (map check-task-completion! tasks))))
+
 (defn execute-info-action! [object]
   (let [object (find-same-object-by-id object (get-in @data [:scene :objects]))
         selection (get @data :selection)]
@@ -160,15 +213,6 @@
           (.attr "stroke-width" "5")
           (.attr "opacity" "0.5")
           (.attr "stroke" "#333"))
-        (let [tasks (get-in @data [:scene :tasks])]
-          (when-let [id (object :id)]
-            (let [task-id (keyword (str "examine-" (name id)))]
-              (when-let [examine-task (find-task task-id tasks)]
-                (let [new-task (if (examine-task :known?)
-                                 (assoc examine-task :complete? true)
-                                 examine-task)
-                      new-tasks (replace-task examine-task new-task tasks)]
-                  (swap! data (fn [data] (assoc-in data [:scene :tasks] new-tasks))))))))
         (refresh-tasks)))
     (em/at js/document
            [".info"] (em/chain
