@@ -38,11 +38,44 @@
      [:div (object :description)]]
     [:div.info]))
 
+(defn find-task [task-id tasks]
+  (when (and tasks (not (empty? tasks)))
+    (let [task (first tasks)]
+      (if (= task-id (task :id))
+        task
+        (if-let [subtask (find-task task-id (task :tasks))]
+          subtask
+          (recur task-id (rest tasks)))))))
+
+(defn replace-task [old-task new-task tasks]
+  (if (or (not tasks) (empty? tasks))
+    []
+    (loop [done-tasks []
+           remaining-tasks tasks]
+      (if (or (not remaining-tasks) (empty? remaining-tasks))
+        done-tasks
+        (let [current-task (first remaining-tasks)
+              current-task (if (= current-task old-task) new-task current-task)
+              current-task-tasks (replace-task old-task new-task (current-task :tasks))
+              new-current-task (assoc current-task :tasks current-task-tasks)]
+          (recur (conj done-tasks new-current-task) (rest remaining-tasks)))))))
+
+(declare refresh-tasks)
+
 (defn info [object]
+  (let [tasks (get-in @data [:scene :tasks])]
+    (when-let [id (object :id)]
+      (let [task-id (keyword (str "examine-" (name id)))]
+        (when-let [examine-task (find-task task-id tasks)]
+          (let [new-task (assoc examine-task :complete? true)
+                new-tasks (replace-task examine-task new-task tasks)]
+            (swap! data (fn [data] (assoc-in data [:scene :tasks] new-tasks))))))))
   (em/at js/document
          [".info"] (em/chain
                     (em/substitute (info-p object))
-                    (em/add-class "show"))))
+                    (em/add-class "show")))
+  (refresh-tasks))
+
 
 (defn draw-object [object]
   (let [[x y] (get object :position [100 100])
