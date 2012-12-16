@@ -63,19 +63,44 @@
 (declare refresh-tasks)
 
 (defn info [object]
-  (let [tasks (get-in @data [:scene :tasks])]
-    (when-let [id (object :id)]
-      (let [task-id (keyword (str "examine-" (name id)))]
-        (when-let [examine-task (find-task task-id tasks)]
-          (let [new-task (assoc examine-task :complete? true)
-                new-tasks (replace-task examine-task new-task tasks)]
-            (swap! data (fn [data] (assoc-in data [:scene :tasks] new-tasks))))))))
-  (em/at js/document
-         [".info"] (em/chain
-                    (em/substitute (info-p object))
-                    (em/add-class "show")))
-  (refresh-tasks))
-
+  (let [selection (get @data :selection)]
+    (when selection
+      (doto selection
+        (.attr "stroke" "")))
+    (when object
+      (let [[x y] (get object :position [100 100])
+            [w h] (get object :size [50 50])
+            scale (get object :scale 1.0)
+            [sx sy] (if (vector? scale) scale [scale scale])
+            [w h] [(* w sx) (* h sy)]
+            selection (or selection
+                          (let [rect (.rect @paper x y w h)]
+                            (swap! data (fn [data]
+                                          (assoc data :selection rect)))
+                            rect))]
+        (doto selection
+          (.attr "x" x)
+          (.attr "y" y)
+          (.attr "width" w)
+          (.attr "height" h)
+          (.attr "fill" "")
+          (.attr "stroke-width" "5")
+          (.attr "opacity" "0.5")
+          (.attr "stroke" "#333"))
+        (let [tasks (get-in @data [:scene :tasks])]
+          (when-let [id (object :id)]
+            (let [task-id (keyword (str "examine-" (name id)))]
+              (when-let [examine-task (find-task task-id tasks)]
+                (let [new-task (if (examine-task :known?)
+                                 (assoc examine-task :complete? true)
+                                 examine-task)
+                      new-tasks (replace-task examine-task new-task tasks)]
+                  (swap! data (fn [data] (assoc-in data [:scene :tasks] new-tasks))))))))
+        (refresh-tasks)))
+    (em/at js/document
+           [".info"] (em/chain
+                      (em/substitute (info-p object))
+                      (em/add-class "show")))))
 
 (defn draw-object [object]
   (let [[x y] (get object :position [100 100])
@@ -84,34 +109,43 @@
         [sx sy] (if (vector? scale) scale [scale scale])
         flip (get object :flip false)
         [w h] [(* w sx) (* h sy)]
-        image (get object :image "img/default.png")
-        image (.image @paper image x y w h)
+        image (when-let [image (object :image)]
+                (.image @paper image x y w h))
         cx (+ x (/ w 2))
         by (+ y h)
         ;;text (.text @paper cx by (str x ", " y))
+        rect (when-not image (.rect @paper x y w h))
         ]
     ;; (doto text
     ;;   (.attr "stroke" "#fff")
     ;;   (.attr "fill" "#fff")
     ;;   (.attr "font-size" "20"))
-    (when flip
-      (.transform image "s-1,1"))
-    (doto image
-      (.click (fn [_] (info object)))
-      ;; (.drag (fn [dx dy x y event]
-      ;;          (let [cx (+ x (/ w 2))
-      ;;                by (+ y h)]
-      ;;            (when flip
-      ;;              (.transform image "s-1,1"))
-      ;;            (.attr image "x" x)
-      ;;            (.attr image "y" y)
-      ;;            ;;(.attr text "x" cx)
-      ;;            ;;(.attr text "y" by)
-      ;;            (when flip
-      ;;              (.transform image "s-1,1"))
-      ;;            ;;(.attr text "text" (str x ", " y))
-      ;;            )))
-      )))
+    (when rect
+      (doto rect
+        (.attr "stroke" "#333")
+        (.attr "fill" "#fff")
+        (.attr "opacity" "0")
+        (.click (fn [_] (info object)))))
+    (when image
+      (when flip
+        (.transform image "s-1,1"))
+      (doto image
+        (.click (fn [_] (info object)))
+        ;; (.drag (fn [dx dy x y event]
+        ;;          (let [cx (+ x (/ w 2))
+        ;;                by (+ y h)]
+        ;;            (when flip
+        ;;              (.transform image "s-1,1"))
+        ;;            (.attr image "x" x)
+        ;;            (.attr image "y" y)
+        ;;            ;;(.attr text "x" cx)
+        ;;            ;;(.attr text "y" by)
+        ;;            (when flip
+        ;;              (.transform image "s-1,1"))
+        ;;            ;;(.attr text "text" (str x ", " y))
+        ;;            )))
+        ))
+    ))
 
 (defpartial tasks-p [tasks]
   [:ul
@@ -135,9 +169,21 @@
         background (.image @paper image 0 0 width height)
         objects (get-in @data [:scene :objects])
         objects (doall (map draw-object objects))
-        ]
+        text (.text @paper 100 50 "Text")]
+    (doto text
+      (.attr "fill" "#eee")
+      (.attr "stroke" "#eee")
+      (.attr "font-size" "20"))
     (doto background
-      (.click (fn [_] (info nil))))
+      (.click (fn [e]
+                (info nil)
+                (let [x (.-x e)
+                      y (.-y e)]
+                  (doto text
+                    (.attr "x" x)
+                    (.attr "y" y)
+                    (.attr "text" (str x ", " y))))
+                )))
     (refresh-tasks)
     ))
 
