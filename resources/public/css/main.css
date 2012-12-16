@@ -70,10 +70,19 @@ body {
     margin-bottom: 5px;
 }
 
-.show {
-    display: block;
+.results {
+    position: absolute;
+    top: 50px;
+    left: 680px;
+    z-index: 20;
+    display: none;
 }
 
 .complete {
     color: #797;
 }
+
+.show {
+    display: block;
+}
+

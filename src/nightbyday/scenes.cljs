@@ -1,7 +1,52 @@
 (ns nightbyday.scenes)
 
+(defn night1 []
+  {:background {:image "img/night.png" :size [1920 1080]}
+   :tasks [{:id :murderalex :name "Murder Alex Thimblewood" :known? true
+            :tasks [{:id :preparemurder :name "Prepare for murder" :known? true
+                     :tasks [{:id :stealknife :name "Find a knife" :known? true :reveal [:lurealexout]}
+                             {:id :lurealexout :name "Lure Alex outside"}]
+                     :reveal [:domurder]}
+                    {:id :domurder :name "Do it now!"
+                     :tasks [{:id :punchthroat :name "Crush his windpipe"}
+                             {:id :gougeeyes :name "Gouge his eyes out"}
+                             {:id :cutstomach :name "Cut his stomach open"}
+                             ]
+                     :reveal [:flee :tossknife :hide]}
+                    {:id :flee :name "Flee from the site!"
+                     :tasks [{:id :tossknife :name "Toss the knife"}
+                             {:id :hide :name "Hide"}]}
+                    ]}]
+   :objects [
+             {:id :smilingslothinn
+              :position [743 269]
+              :size [233 202]
+              :name "Smiling Sloth Inn"
+              :description "Smiling Sloth Inn is the best, and in fact the only, place for visitors to stay in Maple-on-river. Some patrons are still awake at this time of the night."
+              :stealknife {:name "Steal a knife" :description "You sneak in and steal a knife from the kitchen. Just like last night." :result [:knife]}}
+             {:id :policestation
+              :position [0 400]
+              :size [420 600]
+              :name "Police Station"
+              :description "The police station guards the square in the middle of Maple-on-river. There is a light in the window. Alex Thimblewood must be there doing the paperwork for the murder case."
+              :tossrock {:name "Toss a rock at the window" :description "You toss a small rock at the window hoping to draw Alex out." :result [:alexout]}}
+             {:id :alexthimblewood
+              :position [675 740]
+              :image "img/man2.png"
+              :size [168 448]
+              :scale 0.3
+              :opacity "0"
+              :name "Police Officer"
+              :description "A burly looking man in a police officer's uniform looking around the square."
+              :examine "Alex Thimblewood is the residing police officer of Maple-on-river. He is trying to find the cause of the disturbance."
+              :talk "What are you doing here at this time?"
+              :punchthroat {:name "Punch his throat" :description "You punch Alex hard in the throat breaking his windpipe and causing him to stumble back!" :result [:crushedwindpipe] :disable [:examine :talk]}
+              :cutstomach {:name "Cut his stomach open" :description "You take the knife and slice his stomach open just below the navel. Alex tries to cry out but can't make much noise with his throat in that shape!" :result [:cutthroat]}
+              :gougeeyes {:name "Gouge his eyes out" :description "You grab his head with your left hand and force the fingers of your right and into his eye socket. You yank out first the right eye and the left and toss them to the ground. Alex falls down in agony." :result [:alexdown]}}
+             ]})
+
 (defn day1 []
-  {:background {:image "img/village.png" :size [1920 1080]}
+  {:background {:image "img/day.png" :size [1920 1080]}
    :tasks [{:id :findoutwhathappened :name "Find out what happened" :known? true
             :tasks [{:id :talk-alexthimblewood :name "Talk to the police" :known? true}]
             :reveal [:helppolice :investigate :talk-to-witness :examine-tallhouse]}
@@ -24,6 +69,7 @@
               :size [233 202]
               :name "Smiling Sloth Inn"
               :description "Smiling Sloth Inn is the best, and in fact the only, place for visitors to stay in Maple-on-river."}
+
              {:id :stables
               :position [1106 386]
               :size [305 110]
@@ -115,7 +161,6 @@
               :size [168 448]
               :flip true
               :scale 0.2
-              :types #{:person}
               :name "Police Officer"
               :description "A burly looking man standing in a police officer's uniform."
               :examine "Alex Thimblewood is the residing police officer of Maple-on-river. He is examining the crime scene, looking very concerned."

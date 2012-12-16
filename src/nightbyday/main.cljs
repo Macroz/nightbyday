@@ -37,6 +37,11 @@
          (fn [data]
            (assoc data :scene (scenes/day1)))))
 
+(defn init-night1 []
+  (swap! data
+         (fn [data]
+           (assoc data :scene (scenes/night1)))))
+
 (defn replace-object [old-object new-object objects]
   (loop [done-objects []
          remaining-objects objects]
@@ -55,6 +60,23 @@
   (let [action (get-in @data [:actions :examine])]
     (action)))
 
+(defn execute-generic-action! [action-id]
+  (fn []
+    (let [action (get-in @data [:actions action-id])]
+      (action))))
+
+(defn show-action-description! [description]
+  (em/at js/document [".results"] (em/chain (em/content description)
+                                            (em/add-class "show")
+                                            (em/delay 3000 (em/remove-class "show")))))
+
+(defn add-result! [result]
+  (log "Add result " result)
+  (swap! data (fn [data] (update-in data [:results] conj result))))
+
+(defn result? [id]
+  (contains? (@data :results) id))
+
 (defn setup-talk-action [object]
   (let [action-info {:id :talk
                      :name (str "Talk to " (object :name))}
@@ -71,6 +93,42 @@
                )]
     (swap! data (fn [data] (assoc-in data [:actions :talk] talk)))
     action-info))
+
+(defn disable-action! [object action-id]
+  (swap! data (fn [data]
+                (update-in data [:scene :objects]
+                           (fn [old-objects]
+                             (let [disabled-id (keyword (str "disabled-" (name action-id) "?"))
+                                   object (find-same-object-by-id object old-objects)
+                                   new-object (assoc object disabled-id true)
+                                   new-objects (replace-object object new-object old-objects)]
+                               (log "Mark disabled " disabled-id)
+                               new-objects))))))
+
+(defn generic-action-fn [object action-id]
+  (fn []
+    (swap! data (fn [data] (update-in data [:scene :objects]
+                                      (fn [old-objects]
+                                        (let [done-id (keyword (str (name action-id) "?"))
+                                              object (find-same-object-by-id object old-objects)
+                                              new-object (assoc object done-id true)
+                                              new-objects (replace-object object new-object old-objects)]
+                                          (log "Mark done " done-id)
+                                          new-objects)))))
+    (when-let [results (get-in object [action-id :result])]
+      (complete-task! (find-task action-id (get-in @data [:scene :tasks])))
+      (doseq [result results]
+        (add-result! result))
+      (show-action-description! (get-in object [action-id :description])))
+    (when-let [disables (get-in object [action-id :disable])]
+      (doseq [disable disables]
+        (disable-action! object disable)))
+    (execute-info-action! object)))
+
+(defn setup-generic-action [object action-id]
+  (swap! data (fn [data] (assoc-in data [:actions action-id] (generic-action-fn object action-id))))
+  {:id action-id
+   :name (get-in object [action-id :name])})
 
 (defn setup-examine-action [object]
   (let [action-info {:id :examine
@@ -95,11 +153,36 @@
 (defpartial actions-p [object]
   [:div.actions
    (if (and (not (object :examined?))
+            (not (object :disabled-examine?))
             (object :examine))
      (action-p (setup-examine-action object)))
    (if (and (not (object :talked?))
+            (not (object :disabled-talk?))
             (object :talk))
-     (action-p (setup-talk-action object)))])
+     (action-p (setup-talk-action object)))
+   (if (and (not (object :tossrock?))
+            (object :tossrock)
+            (result? :knife))
+     (action-p (setup-generic-action object :tossrock)))
+   (if (and (not (object :stealknife?))
+            (object :stealknife))
+     (action-p (setup-generic-action object :stealknife)))
+   (if (and (not (object :punchthroat?))
+            (object :punchthroat))
+     (action-p (setup-generic-action object :punchthroat)))
+   (if (and (not (object :cutstomach?))
+            (object :cutstomach)
+            (object :punchthroat?))
+     (action-p (setup-generic-action object :cutstomach)))
+   (if (and (not (object :gougeeyes?))
+            (object :gougeeyes)
+            (object :cutstomach?))
+     (action-p (setup-generic-action object :gougeeyes)))
+   (if (and (not (object :tossknife?))
+            (object :tossknife)
+            (object :gougeeyes?))
+     (action-p (setup-generic-action object :tossknife)))
+   ])
 
 (defpartial info-p [object]
   (if object
@@ -119,6 +202,13 @@
       (if (= (object :id) (o :id))
         o
         (recur object (rest objects))))))
+
+(defn find-object [object-id objects]
+  (when (and objects (not (empty? objects)))
+    (let [o (first objects)]
+      (if (= object-id (o :id))
+        o
+        (recur object-id (rest objects))))))
 
 (defn find-task [task-id tasks]
   (when (and tasks (not (empty? tasks)))
@@ -222,6 +312,13 @@
                       (em/add-class "show")))
     (refresh-actions)))
 
+(defn show-object [object-id]
+  (let [object (find-object object-id (get-in @data [:scene :objects]))]
+    (log "Showing " object)
+    (when-let [graphics (object :graphics)]
+      (log "Graphics " graphics)
+      (.attr graphics "opacity" "1.0"))))
+
 (defn draw-object [object]
   (let [[x y] (get object :position [100 100])
         [w h] (get object :size [50 50])
@@ -229,6 +326,7 @@
         [sx sy] (if (vector? scale) scale [scale scale])
         flip (get object :flip false)
         [w h] [(* w sx) (* h sy)]
+        opacity (get object :opacity "1.0")
         image (when-let [image (object :image)]
                 (.image @paper image x y w h))
         cx (+ x (/ w 2))
@@ -236,6 +334,10 @@
         ;;text (.text @paper cx by (str x ", " y))
         rect (when-not image (.rect @paper x y w h))
         ]
+    (swap! data (fn [data]
+                  (let [new-object (assoc object :graphics image)
+                        new-objects (replace-object object new-object (get-in data [:scene :objects]))]
+                    (assoc-in data [:scene :objects] new-objects))))
     ;; (doto text
     ;;   (.attr "stroke" "#fff")
     ;;   (.attr "fill" "#fff")
@@ -250,6 +352,7 @@
       (when flip
         (.transform image "s-1,1"))
       (doto image
+        (.attr "opacity" opacity)
         (.click (fn [_] (execute-info-action! object)))
         ;; (.drag (fn [dx dy x y event]
         ;;          (let [cx (+ x (/ w 2))
@@ -284,9 +387,24 @@
     (em/at js/document
            [".tasks"] (em/content (tasks-p tasks)))))
 
+(defn alex-comes-out! [& args]
+  (execute-info-action! nil)
+  (show-action-description! "Alex storms out of the Police station!")
+  (show-object :alexthimblewood)
+  (complete-task! (find-task :lurealexout (get-in @data [:scene :tasks])))
+  (refresh-tasks))
+
 (defn refresh-actions []
   (em/at js/document
          ["#examine"] (em/listen :click execute-examine-action!)
+         ["#stealknife"] (em/listen :click (execute-generic-action! :stealknife))
+         ["#tossrock"] (em/listen :click (em/chain (em/delay 5000 alex-comes-out!)
+                                                   (execute-generic-action! :tossrock)
+                                                   ))
+         ["#punchthroat"] (em/listen :click (execute-generic-action! :punchthroat))
+         ["#cutstomach"] (em/listen :click (execute-generic-action! :cutstomach))
+         ["#gougeeyes"] (em/listen :click (execute-generic-action! :gougeeyes))
+         ["#tossknife"] (em/listen :click (execute-generic-action! :tossknife))
          ["#talk"] (em/listen :click execute-talk-action!)))
 
 (defn refresh-scene []
@@ -316,8 +434,7 @@
   (let [raphael (.-Raphael js/window)
         new-paper (raphael 0 0 1920 1080)]
     (swap! paper (fn [_] new-paper))
-    (init-day1)
+    ;;    (init-day1)
+    (swap! data (fn [_] {:results #{}}))
+    (init-night1)
     (refresh-scene)))
-
-;;(0f0 startup []
-;;  (goog.Timer/callOnce game-loop 100))

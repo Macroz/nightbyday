@@ -22,7 +22,8 @@
           [:body {:onload "nightbyday.main.startup();"}
            [:canvas#canvas]
            [:div.tasks.block]
-           [:div.info.block]]]))
+           [:div.info.block]
+           [:div.results.block]]]))
 
 (defroutes handler
   (GET "/" [] (welcome-page))
