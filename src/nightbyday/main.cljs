@@ -177,10 +177,10 @@
     (when (and (task :known?)
                (task-subtasks-complete? task)
                (not (task :complete?)))
-      (complete-task! task)
-      (when (and (task :tasks) (not (empty? (task :tasks))))
-        (doall (map check-task-completion! (task :tasks))))
-      )))
+      (complete-task! task))
+    (when (and (task :tasks) (not (empty? (task :tasks))))
+      (doall (map check-task-completion! (task :tasks))))
+    ))
 
 (defn check-tasks-completion! []
   (log "Checking all tasks for completion")

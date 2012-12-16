@@ -6,14 +6,14 @@
             :tasks [{:id :talk-alexthimblewood :name "Talk to the police" :known? true}]
             :reveal [:helppolice :investigate :talk-to-witness :investigate-victim-home]}
            {:id :helppolice :name "Help police to investigate the murder" :known? false
-            :tasks [{:id :investigate :name "Investigate crime scene" :known? false
-                     :tasks [{:id :examine-body :name "Examine body"}
-                             {:id :examine-guts :name "Examine guts"}
-                             {:id :examine-eyes :name "Examine eyes"}
-                             {:id :examine-knife :name "Examine knife"}
-                             {:id :examine-footprint :name "Examine footprint"}]}
-                    {:id :talk-to-witness :name "Talk to witness" :known? false}
-                    {:id :investigate-victim-home :name "Examine victim's home" :known? false}]}]
+            :tasks [{:id :investigate :name "Investigate the crime scene" :known? false
+                     :tasks [{:id :examine-body :name "Examine the body"}
+                             {:id :examine-guts :name "Examine the guts"}
+                             {:id :examine-eyes :name "Examine the eyes"}
+                             {:id :examine-knife :name "Examine the knife"}
+                             {:id :examine-footprints :name "Examine the footprints"}]}
+                    {:id :talk-to-witness :name "Talk to witnesses" :known? false}
+                    {:id :investigate-victim-home :name "Examine the victim's home" :known? false}]}]
    :objects [
              ;; houses
              {:id :smilingslothinn
@@ -60,7 +60,7 @@
               :scale 0.2
               :name "Body"
               :description "The body of a murder victim lies on the edge of the square."
-              :examine "The body of a middle-aged man. The eyes are missing, having been dug out from their sockets. There is severe bruising in the throat area. There is also a gaping whole in the stomach, from where the guts have spilled out. He is obviously dead."}
+              :examine "The body of a middle-aged man, looks like the mutilated corpse of David Winterfall. The eyes are missing, having been dug out from their sockets. There is severe bruising in the throat area. There is also a gaping whole in the stomach, from where the guts have spilled out. He is obviously dead."}
              {:id :eyes
               :position [705 590]
               :image "img/eyes1.png"
@@ -77,6 +77,23 @@
               :name "Guts"
               :description "The guts of the victim have spilled out from his stomach."
               :examine "The gaping wound looks like a cut with a blade."}
+             {:id :knife
+              :position [420 680]
+              :image "img/knife1.png"
+              :size [89 48]
+              :scale 0.3
+              :name "Knife"
+              :description "A bloody knife lies on the ground."
+              :examine "It looks like a kitchen knife. Possibly the murder weapon."}
+
+             {:id :footprints
+              :position [500 640]
+              :image "img/tracks1.png"
+              :size [327 167]
+              :scale 0.25
+              :name "Footprints"
+              :description "Looks like footprints on the ground."
+              :examine "There is some dried up blood in the ground. Perhaps the murdered fled this way."}
 
              ;; people
              {:id :johngoodfellow
@@ -97,7 +114,7 @@
               :name "Police Officer"
               :description "A burly looking man standing in a police officer's uniform."
               :examine "Alex Thimblewood is the residing police officer of Maple-on-river. He is examining the crime scene, looking very concerned."
-              :talk "I heard you are a special detective back at the capital. Might you offer assitance in this matter? Never in my long career have I seen such a horrible crime, let alone in this peaceful village."}
+              :talk "I'm afraid I have some sad news. David, the landlord of this tall building, was murdered last night. I heard you are a special detective back at the capital. Might you offer assitance in this matter? Never in my long career have I seen such a horrible crime, let alone in this peaceful village."}
              {:id :eyrikoxhead
               :position [1130 460]
               :image "img/man2.png"
