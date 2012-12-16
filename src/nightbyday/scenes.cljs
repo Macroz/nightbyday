@@ -1,7 +1,8 @@
 (ns nightbyday.scenes)
 
 (defn night1 []
-  {:background {:image "img/night.png" :size [1920 1080]}
+  {:id :night1
+   :background {:image "img/night.png" :size [1920 1080]}
    :tasks [{:id :murderalex :name "Murder Alex Thimblewood" :known? true
             :tasks [{:id :preparemurder :name "Prepare for murder" :known? true
                      :tasks [{:id :stealknife :name "Find a knife" :known? true :reveal [:lurealexout]}
@@ -43,10 +44,12 @@
               :punchthroat {:name "Punch his throat" :description "You punch Alex hard in the throat breaking his windpipe and causing him to stumble back!" :result [:crushedwindpipe] :disable [:examine :talk]}
               :cutstomach {:name "Cut his stomach open" :description "You take the knife and slice his stomach open just below the navel. Alex tries to cry out but can't make much noise with his throat in that shape!" :result [:cutthroat]}
               :gougeeyes {:name "Gouge his eyes out" :description "You grab his head with your left hand and force the fingers of your right and into his eye socket. You yank out first the right eye and the left and toss them to the ground. Alex falls down in agony." :result [:alexdown]}}
-             ]})
+             ]
+   :next :end})
 
 (defn day1 []
-  {:background {:image "img/day.png" :size [1920 1080]}
+  {:id :day1
+   :background {:image "img/day.png" :size [1920 1080]}
    :tasks [{:id :findoutwhathappened :name "Find out what happened" :known? true
             :tasks [{:id :talk-alexthimblewood :name "Talk to the police" :known? true}]
             :reveal [:helppolice :investigate :talk-to-witness :examine-tallhouse]}
@@ -182,4 +185,5 @@
               :name "Councillor"
               :description "Peter Paulson is an esteemed villager and head of the city council."
               :talk "It's such shame. He was a good man and my personal friend, David that is. I have no idea who did it."}
-             ]})
+             ]
+   :next :night1})

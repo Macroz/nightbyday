@@ -32,6 +32,12 @@
 (declare find-task)
 (declare complete-task!)
 (declare find-same-object-by-id)
+(declare play)
+(declare init-day1!)
+(declare init-night1!)
+(declare refresh-scene)
+(declare show-action-description!)
+(declare init-outro!)
 
 (defpartial intro-content-p []
   [:div.content
@@ -41,35 +47,94 @@
    [:p "Staying at the Smiling Sloth Inn, you woke up in the morning to the sounds of alarmed noises outside. Deciding to skip breakfast you headed out through the main hall into the village square."]
    [:p#day1.action "Start your vacation"]])
 
+(defpartial day1-end-content-p []
+  [:div.content
+   [:h1 "Night"]
+   [:p "The kill did not quench your lust. It merely satisfied you for the moment. It delayed the inevitable."]
+   [:p "It was time to kill again. And you wanted to start with the nosy police offier. Alex must die tonight."]
+   [:p "With grim determination you leave your hideout and enter the village square."]
+   [:p#night1.action "Go on with the hunt"]])
+
+(defpartial outro-content-p []
+  [:div.content
+   [:h1 "Epilogue"]
+   [:p "Thank you for playing the murder mystery game " [:strong "Night by Day"]]
+   [:p "Made by " [:a {:href "http://markku.rontu.net"} "Markku Rontu"] " / markku.rontu@iki.fi / @zorcam"]
+   [:p "Let me know what you think!"]
+   [:p "The story continues soon..."]])
+
 (defn transition-to-day1! []
   (em/at js/document
-         [".demo"] (em/chain (em/content (intro-content-p))
-                             (em/fade-out 1000)
-                             ;;(em/remove-class "show")
-                             (init-day1))))
+         [".demo"] (em/chain (em/fade-out 1500)
+                             (em/add-class "hide")
+                             (em/delay 500 (play init-day1!))
+                             )))
 
-(defn init-intro []
+(defn transition-to-night1! []
+  (em/at js/document
+         [".demo"] (em/chain (em/fade-out 1500)
+                             (em/add-class "hide")
+                             (em/delay 500 (play init-night1!))
+                             )))
+
+(defn init-intro! []
   (em/at js/document
          [".demo"] (em/chain (em/content (intro-content-p))
-                             (em/add-class "show"))
+                             (em/remove-class "hide")
+                             (em/fade-in 1500))
          ["#day1"] (em/listen :click transition-to-day1!)
          ))
 
-(defn init-day1 []
+(defn init-day1-end! []
+  (em/at js/document
+         [".game"] (em/chain (em/fade-out 1500))
+         [".demo"] (em/chain (em/content (day1-end-content-p))
+                             (em/remove-class "hide")
+                             (em/fade-in 1500))
+         ["#night1"] (em/listen :click transition-to-night1!)
+         ))
+
+(defn init-outro! []
+  (em/at js/document
+         [".game"] (em/chain (em/fade-out 1500))
+         [".demo"] (em/chain (em/content (outro-content-p))
+                             (em/remove-class "hide")
+                             (em/fade-in 1500))
+         ))
+
+(defn play [scene-fn]
+  (fn []
+    (scene-fn)
+    (em/at js/document
+           [".game"] (em/fade-in 1500))))
+
+(defn next-scene! []
+  (let [current-scene-id (get-in @data [:scene :id])
+        next-scene-id (get-in @data [:scene :next])]
+    (log "Current " current-scene-id " next " next-scene-id)
+    (case next-scene-id
+      :night1 (init-day1-end!)
+      :end (init-outro!))))
+
+(defn init-day1! []
   (swap! data
          (fn [data]
            (assoc data :scene (scenes/day1))))
-  (show-action-description! "People are shouting all over the square! You decide to find out what has happened." 5000)
+  (show-action-description! "People are shouting all over the square! You decide to find out what has happened." 7000)
   (em/at js/document
-         [".tasks"] (em/chain (em/fade-in 1000)
-                              (em/add-class "show")))
+         [".tasks"] (em/chain (em/delay 7000 (em/fade-in 1000))))
   (refresh-scene))
 
-(defn init-night1 []
+
+(defn init-night1! []
   (swap! data
          (fn [data]
            (assoc data :scene (scenes/night1))))
+  (show-action-description! "The time is right. But you must be careful." 7000)
+  (em/at js/document
+         [".tasks"] (em/chain (em/delay 7000 (em/fade-in 1000))))
   (refresh-scene))
+
 
 (defn replace-object [old-object new-object objects]
   (loop [done-objects []
@@ -97,8 +162,8 @@
 (defn show-action-description! [description & timeout]
   (let [timeout (or (and timeout (first timeout)) 3000)]
     (em/at js/document [".results"] (em/chain (em/content description)
-                                              (em/add-class "show")
-                                              (em/delay timeout (em/remove-class "show"))))))
+                                              (em/fade-in 1000)
+                                              (em/delay timeout (em/fade-out 1000))))))
 
 (defn add-result! [result]
   (log "Add result " result)
@@ -307,7 +372,9 @@
 (defn check-tasks-completion! []
   (log "Checking all tasks for completion")
   (let [tasks (get-in @data [:scene :tasks])]
-    (doall (map check-task-completion! tasks))))
+    (doall (map check-task-completion! tasks))
+    (when (every? :complete? tasks)
+      (next-scene!))))
 
 (defn execute-info-action! [object]
   (let [object (find-same-object-by-id object (get-in @data [:scene :objects]))
@@ -336,10 +403,12 @@
           (.attr "opacity" "0.5")
           (.attr "stroke" "#333"))
         (refresh-tasks)))
-    (em/at js/document
-           [".info"] (em/chain
-                      (em/substitute (info-p object))
-                      (em/add-class "show")))
+    (if object
+      (em/at js/document
+             [".info"] (em/chain (em/substitute (info-p object))
+                                 (em/add-class "show")))
+      (em/at js/document
+             [".info"] (em/chain (em/remove-class "show"))))
     (refresh-actions)))
 
 (defn show-object [object-id]
@@ -449,14 +518,14 @@
       (.attr "font-size" "20"))
     (doto background
       (.click (fn [e]
-                (execute-info-action! nil)
-                (let [x (.-x e)
-                      y (.-y e)]
-                  (doto text
-                    (.attr "x" x)
-                    (.attr "y" y)
-                    (.attr "text" (str x ", " y))))
-                )))
+                (execute-info-action! nil))))
+    ;; (let [x (.-x e)
+    ;;       y (.-y e)]
+    ;;   (doto text
+    ;;     (.attr "x" x)
+    ;;     (.attr "y" y)
+    ;;     (.attr "text" (str x ", " y))))
+    ;; )))
     (refresh-tasks)
     ))
 
@@ -465,4 +534,4 @@
         new-paper (raphael "paper" 1920 1080)]
     (swap! paper (fn [_] new-paper))
     (swap! data (fn [_] {:results #{}}))
-    (init-intro)))
+    (init-intro!)))
