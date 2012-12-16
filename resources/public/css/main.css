@@ -1,9 +1,13 @@
+body {
+    width: 1920px;
+}
+
 .block {
     position: absolute;
     z-index: 10;
     color: #ccc;
     font-size: 2em;
-    border: 1px solid black;
+    border: 5px solid #222;
     padding: 25px;
     margin: 0;
     background-color: #555;
@@ -11,8 +15,20 @@
     box-shadow: 5px 5px 10px #000;
 }
 
+.actions {
+    margin-top: 25px;
+}
+
+.action {
+    background-color: #777;
+    border: 5px solid #222;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
 .tasks {
-    right: 50px;
+    //right: 50px; /* doesn't work on ipad */
+    left: 1320px;
     top: 50px;
 }
 

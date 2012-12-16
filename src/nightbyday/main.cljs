@@ -26,17 +26,65 @@
 (def data (atom {}))
 (def paper (atom nil))
 
+(declare refresh-tasks)
+(declare refresh-actions)
+(declare execute-info-action!)
+
 (defn init-day1 []
   (swap! data
          (fn [data]
            (assoc data :scene (scenes/day1)))))
 
+(defn replace-object [old-object new-object objects]
+  (loop [done-objects []
+         remaining-objects objects]
+    (if (or (not remaining-objects) (empty? remaining-objects))
+      done-objects
+      (let [object (first remaining-objects)]
+        (if (= object old-object)
+          (recur (conj done-objects new-object) (rest remaining-objects))
+          (recur (conj done-objects object) (rest remaining-objects)))))))
+
+(defn execute-examine-action! []
+  (let [action (get-in @data [:actions :examine])]
+    (action)))
+
+(defn setup-examine-action [object]
+  (let [action-info {:id :examine
+                     :name (str "Examine " (object :name))}
+        examine (fn []
+                  (swap! data (fn [data] (update-in data [:scene :objects]
+                                                    (fn [old-objects]
+                                                      (let [new-object (assoc object :examined? true)
+                                                            new-objects (replace-object object new-object old-objects)]
+                                                        new-objects)))))
+                  (execute-info-action! object)
+                  )]
+    (swap! data (fn [data] (assoc-in data [:actions :examine] examine)))
+    action-info))
+
+(defpartial action-p [action]
+  [:div.action {:id (name (action :id))} (action :name)])
+
+(defpartial actions-p [object]
+  [:div.actions
+   (if (not (object :examined?))
+     (action-p (setup-examine-action object)))])
+
 (defpartial info-p [object]
   (if object
     [:div.info.block
      [:h1 (get object :name)]
-     [:div (object :description)]]
+     [:div (object :description)]
+     (actions-p object)]
     [:div.info]))
+
+(defn find-same-object-by-id [object objects]
+  (when (and object objects)
+    (let [o (first objects)]
+      (if (= (object :id) (o :id))
+        o
+        (recur object (rest objects))))))
 
 (defn find-task [task-id tasks]
   (when (and tasks (not (empty? tasks)))
@@ -60,10 +108,9 @@
               new-current-task (assoc current-task :tasks current-task-tasks)]
           (recur (conj done-tasks new-current-task) (rest remaining-tasks)))))))
 
-(declare refresh-tasks)
-
-(defn info [object]
-  (let [selection (get @data :selection)]
+(defn execute-info-action! [object]
+  (let [object (find-same-object-by-id object (get-in @data [:scene :objects]))
+        selection (get @data :selection)]
     (when selection
       (doto selection
         (.attr "stroke" "")))
@@ -100,7 +147,8 @@
     (em/at js/document
            [".info"] (em/chain
                       (em/substitute (info-p object))
-                      (em/add-class "show")))))
+                      (em/add-class "show")))
+    (refresh-actions)))
 
 (defn draw-object [object]
   (let [[x y] (get object :position [100 100])
@@ -125,12 +173,12 @@
         (.attr "stroke" "#333")
         (.attr "fill" "#fff")
         (.attr "opacity" "0")
-        (.click (fn [_] (info object)))))
+        (.click (fn [_] (execute-info-action! object)))))
     (when image
       (when flip
         (.transform image "s-1,1"))
       (doto image
-        (.click (fn [_] (info object)))
+        (.click (fn [_] (execute-info-action! object)))
         ;; (.drag (fn [dx dy x y event]
         ;;          (let [cx (+ x (/ w 2))
         ;;                by (+ y h)]
@@ -164,19 +212,22 @@
     (em/at js/document
            [".tasks"] (em/content (tasks-p tasks)))))
 
+(defn refresh-actions []
+  (em/at js/document ["#examine"] (em/listen :click execute-examine-action!)))
+
 (defn refresh-scene []
   (let [{image :image [width height] :size} (get-in @data [:scene :background])
         background (.image @paper image 0 0 width height)
         objects (get-in @data [:scene :objects])
         objects (doall (map draw-object objects))
-        text (.text @paper 100 50 "Text")]
+        text (.text @paper 100 50 "")]
     (doto text
       (.attr "fill" "#eee")
       (.attr "stroke" "#eee")
       (.attr "font-size" "20"))
     (doto background
       (.click (fn [e]
-                (info nil)
+                (execute-info-action! nil)
                 (let [x (.-x e)
                       y (.-y e)]
                   (doto text
