@@ -13,9 +13,9 @@
                              {:id :gougeeyes :name "Gouge his eyes out"}
                              {:id :cutstomach :name "Cut his stomach open"}
                              ]
-                     :reveal [:flee :tossknife :hide]}
+                     :reveal [:flee :tossknife]}
                     {:id :flee :name "Flee from the site!"
-                     :tasks [{:id :tossknife :name "Toss the knife"}
+                     :tasks [{:id :tossknife :name "Toss the knife" :reveal [:hide]}
                              {:id :hide :name "Hide"}]}
                     ]}]
    :objects [
@@ -25,12 +25,24 @@
               :name "Smiling Sloth Inn"
               :description "Smiling Sloth Inn is the best, and in fact the only, place for visitors to stay in Maple-on-river. Some patrons are still awake at this time of the night."
               :stealknife {:name "Steal a knife" :description "You sneak in and steal a knife from the kitchen. Just like last night." :result [:knife]}}
+             {:id :stables
+              :position [1106 386]
+              :size [305 110]
+              :name "Stables"
+              :description "These are the stables of the Smiling Sloth Inn. There are no horses here at the moent. The stableboy must be busy with something else, because he is not here either."
+              :hide {:name "Hide in the stables" :description "You sneak into the stables to hide." :result [:hidden]}}
              {:id :policestation
               :position [0 400]
               :size [420 600]
               :name "Police Station"
               :description "The police station guards the square in the middle of Maple-on-river. There is a light in the window. Alex Thimblewood must be there doing the paperwork for the murder case."
               :tossrock {:name "Toss a rock at the window" :description "You toss a small rock at the window hoping to draw Alex out." :result [:alexout]}}
+             {:id :generalstore
+              :position [1430 330]
+              :size [500 340]
+              :name "General Store"
+              :description "The Good Ol' General Store is the main supplier of goods in Maple-on-river. Most people have their own livestock and gardens for growing vegetables, but the goods produced elsewhere come here. There is a delivery of new goods every week. It is closed for the night."
+              :tossknife {:name "Toss the knife" :description "You throw the knife under the porch of the store." :result [:tossedknife]}}
              {:id :alexthimblewood
               :position [675 740]
               :image "img/man2.png"

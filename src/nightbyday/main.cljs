@@ -86,6 +86,7 @@
          ))
 
 (defn init-day1-end! []
+  (execute-info-action! nil)
   (em/at js/document
          [".game"] (em/chain (em/fade-out 1500))
          [".demo"] (em/chain (em/content (day1-end-content-p))
@@ -95,6 +96,7 @@
          ))
 
 (defn init-outro! []
+  (execute-info-action! nil)
   (em/at js/document
          [".game"] (em/chain (em/fade-out 1500))
          [".demo"] (em/chain (em/content (outro-content-p))
@@ -130,7 +132,7 @@
   (swap! data
          (fn [data]
            (assoc data :scene (scenes/night1))))
-  (show-action-description! "The time is right. But you must be careful." 7000)
+  (show-action-description! "The time is right. You feel it. But you must be careful..." 7000)
   (em/at js/document
          [".tasks"] (em/chain (em/delay 7000 (em/fade-in 1000))))
   (refresh-scene))
@@ -161,9 +163,11 @@
 
 (defn show-action-description! [description & timeout]
   (let [timeout (or (and timeout (first timeout)) 3000)]
-    (em/at js/document [".results"] (em/chain (em/content description)
-                                              (em/fade-in 1000)
-                                              (em/delay timeout (em/fade-out 1000))))))
+    (log "Delay " timeout)
+    (em/at js/document
+           [".results"] (em/chain (em/content description)
+                                  (em/fade-in 1000)
+                                  (em/delay timeout (em/fade-out 1000))))))
 
 (defn add-result! [result]
   (log "Add result " result)
@@ -275,8 +279,12 @@
      (action-p (setup-generic-action object :gougeeyes)))
    (if (and (not (object :tossknife?))
             (object :tossknife)
-            (object :gougeeyes?))
+            (result? :alexdown))
      (action-p (setup-generic-action object :tossknife)))
+   (if (and (not (object :hide?))
+            (object :hide)
+            (result? :tossedknife))
+     (action-p (setup-generic-action object :hide)))
    ])
 
 (defpartial info-p [object]
@@ -374,7 +382,8 @@
   (let [tasks (get-in @data [:scene :tasks])]
     (doall (map check-task-completion! tasks))
     (when (every? :complete? tasks)
-      (next-scene!))))
+      (em/at js/document
+             ["body"] (em/delay 3000 next-scene!)))))
 
 (defn execute-info-action! [object]
   (let [object (find-same-object-by-id object (get-in @data [:scene :objects]))
@@ -504,6 +513,7 @@
          ["#cutstomach"] (em/listen :click (execute-generic-action! :cutstomach))
          ["#gougeeyes"] (em/listen :click (execute-generic-action! :gougeeyes))
          ["#tossknife"] (em/listen :click (execute-generic-action! :tossknife))
+         ["#hide"] (em/listen :click (execute-generic-action! :hide))
          ["#talk"] (em/listen :click execute-talk-action!)))
 
 (defn refresh-scene []
@@ -534,4 +544,5 @@
         new-paper (raphael "paper" 1920 1080)]
     (swap! paper (fn [_] new-paper))
     (swap! data (fn [_] {:results #{}}))
-    (init-intro!)))
+    (init-intro!)
+    ))
