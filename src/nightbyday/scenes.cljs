@@ -4,7 +4,7 @@
   {:background {:image "img/village.png" :size [1920 1080]}
    :tasks [{:id :findoutwhathappened :name "Find out what happened" :known? true
             :tasks [{:id :talk-alexthimblewood :name "Talk to the police" :known? true}]
-            :reveal [:helppolice :investigate :talk-to-witness :investigate-victim-home]}
+            :reveal [:helppolice :investigate :talk-to-witness :examine-tallhouse]}
            {:id :helppolice :name "Help police to investigate the murder" :known? false
             :tasks [{:id :investigate :name "Investigate the crime scene" :known? false
                      :tasks [{:id :examine-body :name "Examine the body"}
@@ -12,8 +12,11 @@
                              {:id :examine-eyes :name "Examine the eyes"}
                              {:id :examine-knife :name "Examine the knife"}
                              {:id :examine-footprints :name "Examine the footprints"}]}
-                    {:id :talk-to-witness :name "Talk to witnesses" :known? false}
-                    {:id :investigate-victim-home :name "Examine the victim's home" :known? false}]}]
+                    {:id :talk-to-witness :name "Talk to witnesses" :known? false
+                     :tasks [{:id :talk-johngoodfellow :name "Talk to John"}
+                             {:id :talk-eyrikoxhead :name "Talk to Eyrik"}
+                             {:id :talk-peterpaulson :name "Talk to Peter"}]}
+                    {:id :examine-tallhouse :name "Examine the victim's home" :known? false}]}]
    :objects [
              ;; houses
              {:id :smilingslothinn
@@ -30,7 +33,8 @@
               :position [173 159]
               :size [434 470]
               :name "Tall house"
-              :description "This is the tallest house in Maple-on-river. Three households live there. There is a shed next to it."}
+              :description "This is the tallest house in Maple-on-river. Three households live there. There is a shed next to it."
+              :examine "David Winterfall owns this house. Or owned it. He also used to live here in the first floor. Something must have drawn his attention for him to come out at night."}
              {:id :shed
               :position [614 420]
               :size [90 130]
@@ -103,7 +107,8 @@
               :flip true
               :scale [0.22 0.27]
               :name "Farmer"
-              :description "John Goodfellow is a tall man with a booming voice. He is farmer by profession and lives just next to the village square."}
+              :description "John Goodfellow is a tall man with a booming voice. He is farmer by profession and lives just next to the village square."
+              :talk "I came out in the morning to go to the fields and saw David lying on the ground. I'm horrified this can happen in our little village."}
              {:id :alexthimblewood
               :position [755 540]
               :image "img/man2.png"
@@ -114,7 +119,7 @@
               :name "Police Officer"
               :description "A burly looking man standing in a police officer's uniform."
               :examine "Alex Thimblewood is the residing police officer of Maple-on-river. He is examining the crime scene, looking very concerned."
-              :talk "I'm afraid I have some sad news. David, the landlord of this tall building, was murdered last night. I heard you are a special detective back at the capital. Might you offer assitance in this matter? Never in my long career have I seen such a horrible crime, let alone in this peaceful village."}
+              :talk "I'm afraid I have sad news. David, the landlord of this tall building, was murdered last night. I heard you are a special detective back at the capital. Might you offer assitance in this matter? Never in my long career have I seen such a horrible crime, let alone in this peaceful village. Please do what you can to help!"}
              {:id :eyrikoxhead
               :position [1130 460]
               :image "img/man2.png"
@@ -122,12 +127,14 @@
               :flip true
               :scale 0.15
               :name "Innkeeper"
-              :description "Eyrik Oxhead is the owner of the Smiling Sloth Inn. He has come out to see what the commotion is about."}
+              :description "Eyrik Oxhead is the owner of the Smiling Sloth Inn. He has come out to see what the commotion is about."
+              :talk "I'm glad you are here. With your help, we will catch the guilty quickly!"}
              {:id :peterpaulson
               :position [500 880]
               :image "img/man3.png"
               :size [266 448]
               :scale 0.3
               :name "Councillor"
-              :description "Peter Paulson is an esteemed villager and head of the city council."}
+              :description "Peter Paulson is an esteemed villager and head of the city council."
+              :talk "It's such shame. He was a good man and my personal friend, David that is. I have no idea who did it."}
              ]})
