@@ -89,8 +89,11 @@
               :size [168 448]
               :flip true
               :scale 0.2
+              :types #{:person}
               :name "Police Officer"
-              :description "Alex Thimblewood is the residing police officer of Maple-on-river. He is examining the crime scene, looking very concerned."}
+              :description "A burly looking man standing in a police officer's uniform."
+              :examine "Alex Thimblewood is the residing police officer of Maple-on-river. He is examining the crime scene, looking very concerned."
+              :talk "I heard you are a special detective back at the capital. Might you offer assitance in this matter? Never in my long career have I seen such a horrible crime, let alone in this peaceful village."}
              {:id :eyrikoxhead
               :position [1130 460]
               :image "img/man2.png"

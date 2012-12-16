@@ -45,9 +45,27 @@
           (recur (conj done-objects new-object) (rest remaining-objects))
           (recur (conj done-objects object) (rest remaining-objects)))))))
 
+(defn execute-talk-action! []
+  (let [action (get-in @data [:actions :talk])]
+    (action)))
+
 (defn execute-examine-action! []
   (let [action (get-in @data [:actions :examine])]
     (action)))
+
+(defn setup-talk-action [object]
+  (let [action-info {:id :talk
+                     :name (str "Talk to " (object :name))}
+        talk (fn []
+               (swap! data (fn [data] (update-in data [:scene :objects]
+                                                 (fn [old-objects]
+                                                   (let [new-object (assoc object :talked? true)
+                                                         new-objects (replace-object object new-object old-objects)]
+                                                     new-objects)))))
+               (execute-info-action! object)
+               )]
+    (swap! data (fn [data] (assoc-in data [:actions :talk] talk)))
+    action-info))
 
 (defn setup-examine-action [object]
   (let [action-info {:id :examine
@@ -68,14 +86,22 @@
 
 (defpartial actions-p [object]
   [:div.actions
-   (if (not (object :examined?))
-     (action-p (setup-examine-action object)))])
+   (if (and (not (object :examined?))
+            (object :examine))
+     (action-p (setup-examine-action object)))
+   (if (and (not (object :talked?))
+            (object :talk))
+     (action-p (setup-talk-action object)))])
 
 (defpartial info-p [object]
   (if object
     [:div.info.block
      [:h1 (get object :name)]
      [:div (object :description)]
+     (when (object :examined?)
+       [:div.examine (object :examine)])
+     (when (object :talked?)
+       [:div.talk "\"" (object :talk) "\""])
      (actions-p object)]
     [:div.info]))
 
@@ -213,7 +239,9 @@
            [".tasks"] (em/content (tasks-p tasks)))))
 
 (defn refresh-actions []
-  (em/at js/document ["#examine"] (em/listen :click execute-examine-action!)))
+  (em/at js/document
+         ["#examine"] (em/listen :click execute-examine-action!)
+         ["#talk"] (em/listen :click execute-talk-action!)))
 
 (defn refresh-scene []
   (let [{image :image [width height] :size} (get-in @data [:scene :background])

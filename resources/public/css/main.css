@@ -15,6 +15,15 @@ body {
     box-shadow: 5px 5px 10px #000;
 }
 
+.examine {
+    margin-top: 25px;
+}
+
+.talk {
+    margin-top: 25px;
+    font-style: italic;
+}
+
 .actions {
     margin-top: 25px;
 }
@@ -24,6 +33,10 @@ body {
     border: 5px solid #222;
     padding-left: 10px;
     cursor: pointer;
+}
+
+.action + .action {
+    margin-top: 10px;
 }
 
 .tasks {
