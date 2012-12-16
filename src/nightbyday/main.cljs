@@ -29,6 +29,8 @@
 (declare refresh-tasks)
 (declare refresh-actions)
 (declare execute-info-action!)
+(declare find-task)
+(declare complete-task!)
 
 (defn init-day1 []
   (swap! data
