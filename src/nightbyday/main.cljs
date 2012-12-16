@@ -48,8 +48,9 @@
   (let [[x y] (get object :position [100 100])
         [w h] (get object :size [50 50])
         scale (get object :scale 1.0)
+        [sx sy] (if (vector? scale) scale [scale scale])
         flip (get object :flip false)
-        [w h] [(* w scale) (* h scale)]
+        [w h] [(* w sx) (* h sy)]
         image (get object :image "img/default.png")
         image (.image @paper image x y w h)
         cx (+ x (/ w 2))

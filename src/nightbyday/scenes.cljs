@@ -32,7 +32,7 @@
               :image "img/man1.png"
               :size [236 438]
               :flip true
-              :scale 0.2
+              :scale [0.2 0.27]
               :name "Joe"
               :description "Tall man."}
              {:position [1130 460]
