@@ -4,13 +4,28 @@
   (:use [ring.adapter.jetty :only [run-jetty]])
   (:use [hiccup core element page]))
 
+(defn link-image [src]
+  [:a {:href src}
+   [:img {:src src
+          :width 300
+          :height 200}]])
+
 (defn welcome-page []
   (html5 [:html
           [:head
-           [:title "Night By Day"]]
+           [:title "Night By Day"]
+           (include-css "css/welcome.css")]
           [:body
-           [:h1 "Night By Day"]
-           [:a {:href "/game"} "Play"]]]))
+           [:div.center
+            [:div.content
+             [:h1 "Night By Day"]
+             [:p "A brutal adventure game entry to " [:a {:href "http://www.ludumdare.com"} "Ludum Dare #25"] ". Not for the faint of heart!"]
+             [:p "By Markku Rontu / markku.rontu@iki.fi / @zorcam"]
+             [:div.center
+              [:p.play [:a {:href "/game"} "Play"]]]
+             [:div.center
+              [:p.screenshots (link-image "img/screenshot1.png")
+               (link-image "img/screenshot2.png")]]]]]]))
 
 (defn game-page []
   (html5 [:html
