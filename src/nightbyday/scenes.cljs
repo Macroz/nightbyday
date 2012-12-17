@@ -29,7 +29,7 @@
               :position [1106 386]
               :size [305 110]
               :name "Stables"
-              :description "These are the stables of the Smiling Sloth Inn. There are no horses here at the moent. The stableboy must be busy with something else, because he is not here either."
+              :description "These are the stables of the Smiling Sloth Inn. There are no horses here at the moment. The stableboy must be busy with something else, because he is not here either."
               :hide {:name "Hide in the stables" :description "You sneak into the stables to hide." :result [:hidden]}}
              {:id :policestation
               :position [0 400]
@@ -55,7 +55,7 @@
               :talk "What are you doing here at this time?"
               :punchthroat {:name "Punch his throat" :description "You punch Alex hard in the throat breaking his windpipe and causing him to stumble back!" :result [:crushedwindpipe] :disable [:examine :talk]}
               :cutstomach {:name "Cut his stomach open" :description "You take the knife and slice his stomach open just below the navel. Alex tries to cry out but can't make much noise with his throat in that shape!" :result [:cutthroat]}
-              :gougeeyes {:name "Gouge his eyes out" :description "You grab his head with your left hand and force the fingers of your right and into his eye socket. You yank out first the right eye and the left and toss them to the ground. Alex falls down in agony." :result [:alexdown]}}
+              :gougeeyes {:name "Gouge his eyes out" :description "You grab his head with your left hand and force the fingers of your right into his eye socket. You yank out first the right eye and the left and toss them to the ground. Alex falls down in agony." :result [:alexdown]}}
              ]
    :next :end})
 
