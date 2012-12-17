@@ -33,6 +33,7 @@
                [:li "I didn't have time for sounds or music. I was just too lazy :-)"]
                [:li "Saturday evening with champaign was fun ;-)"]
                [:li "Concentrating on a short intensive sprint seems like a good way to get things done!"]
+               [:li "I use a bit of Inkscape like last time, but also decided to re-learn some Blender."]
                [:li "I more or less managed to finish the first day of the game (of four days). Game is winnable!"]]]
              [:p "Thanks, have fun, more to come!"]]]]]))
 
