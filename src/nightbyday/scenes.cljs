@@ -127,7 +127,7 @@
               :description "The body of a murder victim lies on the edge of the square."
               :examine "The body of a middle-aged man, looks like the mutilated corpse of David Winterfall. The eyes are missing, having been dug out from their sockets. There is severe bruising in the throat area. There is also a gaping whole in the stomach, from where the guts have spilled out. He is obviously dead."}
              {:id :eyes
-              :position [705 590]
+              :position [700 580]
               :image "img/eyes1.png"
               :size [102 57]
               :scale 0.2
