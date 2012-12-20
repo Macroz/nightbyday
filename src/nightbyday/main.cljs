@@ -451,6 +451,8 @@
     ;;   (.attr "fill" "#fff")
     ;;   (.attr "font-size" "20"))
     (when rect
+      (when (object :id)
+        (set! (.-id (.-node rect)) (name (object :id))))
       (doto rect
         (.attr "stroke" "#333")
         (.attr "fill" "#fff")
@@ -459,6 +461,8 @@
     (when image
       (when flip
         (.transform image "s-1,1"))
+      (when (object :id)
+        (set! (.-id (.-node image)) (name (object :id))))
       (doto image
         (.attr "opacity" opacity)
         (.click (fn [_] (execute-info-action! object)))
