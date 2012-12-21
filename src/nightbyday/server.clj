@@ -1,5 +1,7 @@
 (ns nightbyday.server
   (:use compojure.core)
+  (:use [clojure.walk :only [keywordize-keys]])
+  (:use [ring.middleware.params :only [wrap-params]])
   (:require [compojure.route :as route])
   (:use [ring.adapter.jetty :only [run-jetty]])
   (:use [hiccup core element page]))
@@ -37,14 +39,14 @@
                [:li "I more or less managed to finish the first day of the game (of four days). Game is winnable!"]]]
              [:p "Thanks, have fun, more to come!"]]]]]))
 
-(defn game-page []
+(defn game-page [params]
   (html5 [:html
           [:head
            [:title "Night By Day"]
            (include-css "css/main.css")
            (include-js "js/raphael-min.js")
            (include-js "js/cljs.js")]
-          [:body {:onload "nightbyday.main.startup();"}
+          [:body {:onload (str "nightbyday.main.startup(" (params :delay) ");")}
            [:div.game
             [:div#paper]
             [:div.tasks.block]
@@ -54,11 +56,13 @@
 
 (defroutes handler
   (GET "/" [] (welcome-page))
-  (GET "/game" [] (game-page))
+  (GET "/game" {params :params} (game-page (keywordize-keys params)))
   (route/resources "/")
   (route/not-found "Page not found!"))
 
-(def app (-> handler))
+(def app (-> handler
+             wrap-params
+             ))
 
 (def server (atom nil))
 

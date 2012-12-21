@@ -63,52 +63,55 @@
    [:p "Let me know what you think!"]
    [:p "The story continues soon..."]])
 
+(defn delay-time [x]
+  (int (Math/round (* x (@data :delay)))))
+
 (defn transition-to-day1! []
   (em/at js/document
-         [".demo"] (em/chain (em/fade-out 1500)
+         [".demo"] (em/chain (em/fade-out (delay-time 1.5))
                              (em/add-class "hide")
-                             (em/delay 500 (play init-day1!))
+                             (em/delay (delay-time 0.5) (play init-day1!))
                              )))
 
 (defn transition-to-night1! []
   (em/at js/document
-         [".demo"] (em/chain (em/fade-out 1500)
+         [".demo"] (em/chain (em/fade-out (delay-time 1.5))
                              (em/add-class "hide")
-                             (em/delay 500 (play init-night1!))
+                             (em/delay (delay-time 0.5) (play init-night1!))
                              )))
 
 (defn init-intro! []
   (em/at js/document
          [".demo"] (em/chain (em/content (intro-content-p))
                              (em/remove-class "hide")
-                             (em/fade-in 1500))
+                             (em/fade-in (delay-time 1.5)))
          ["#day1"] (em/listen :click transition-to-day1!)
          ))
 
 (defn init-day1-end! []
   (execute-info-action! nil)
   (em/at js/document
-         [".game"] (em/chain (em/fade-out 1500))
+         [".game"] (em/chain (em/fade-out (delay-time 1.5)))
          [".demo"] (em/chain (em/content (day1-end-content-p))
                              (em/remove-class "hide")
-                             (em/fade-in 1500))
+                             (em/fade-in (delay-time 1.5)))
          ["#night1"] (em/listen :click transition-to-night1!)
          ))
 
 (defn init-outro! []
   (execute-info-action! nil)
   (em/at js/document
-         [".game"] (em/chain (em/fade-out 1500))
+         [".game"] (em/chain (em/fade-out (delay-time 1.5)))
          [".demo"] (em/chain (em/content (outro-content-p))
                              (em/remove-class "hide")
-                             (em/fade-in 1500))
+                             (em/fade-in (delay-time 1.5)))
          ))
 
 (defn play [scene-fn]
   (fn []
     (scene-fn)
     (em/at js/document
-           [".game"] (em/fade-in 1500))))
+           [".game"] (em/fade-in (delay-time 1.5)))))
 
 (defn next-scene! []
   (let [current-scene-id (get-in @data [:scene :id])
@@ -122,9 +125,9 @@
   (swap! data
          (fn [data]
            (assoc data :scene (scenes/day1))))
-  (show-action-description! "People are shouting all over the square! You decide to find out what has happened." 7000)
+  (show-action-description! "People are shouting all over the square! You decide to find out what has happened." 7)
   (em/at js/document
-         [".tasks"] (em/chain (em/delay 7000 (em/fade-in 1000))))
+         [".tasks"] (em/chain (em/delay (delay-time 7) (em/fade-in (delay-time 1)))))
   (refresh-scene))
 
 
@@ -132,9 +135,9 @@
   (swap! data
          (fn [data]
            (assoc data :scene (scenes/night1))))
-  (show-action-description! "The time is right. You feel it. But you must be careful..." 7000)
+  (show-action-description! "The time is right. You feel it. But you must be careful..." 7)
   (em/at js/document
-         [".tasks"] (em/chain (em/delay 7000 (em/fade-in 1000))))
+         [".tasks"] (em/chain (em/delay (delay-time 7) (em/fade-in (delay-time 1)))))
   (refresh-scene))
 
 
@@ -162,12 +165,11 @@
       (action))))
 
 (defn show-action-description! [description & timeout]
-  (let [timeout (or (and timeout (first timeout)) 3000)]
-    (log "Delay " timeout)
+  (let [timeout (or (and timeout (first timeout)) 3)]
     (em/at js/document
            [".results"] (em/chain (em/content description)
-                                  (em/fade-in 1000)
-                                  (em/delay timeout (em/fade-out 1000))))))
+                                  (em/fade-in (delay-time 1))
+                                  (em/delay (delay-time timeout) (em/fade-out (delay-time 1)))))))
 
 (defn add-result! [result]
   (log "Add result " result)
@@ -383,7 +385,7 @@
     (doall (map check-task-completion! tasks))
     (when (every? :complete? tasks)
       (em/at js/document
-             ["body"] (em/delay 3000 next-scene!)))))
+             ["body"] (em/delay (delay-time 3) next-scene!)))))
 
 (defn execute-info-action! [object]
   (let [object (find-same-object-by-id object (get-in @data [:scene :objects]))
@@ -510,7 +512,7 @@
   (em/at js/document
          ["#examine"] (em/listen :click execute-examine-action!)
          ["#stealknife"] (em/listen :click (execute-generic-action! :stealknife))
-         ["#tossrock"] (em/listen :click (em/chain (em/delay 5000 alex-comes-out!)
+         ["#tossrock"] (em/listen :click (em/chain (em/delay (delay-time 5) alex-comes-out!)
                                                    (execute-generic-action! :tossrock)
                                                    ))
          ["#punchthroat"] (em/listen :click (execute-generic-action! :punchthroat))
@@ -543,10 +545,11 @@
     (refresh-tasks)
     ))
 
-(defn startup []
+(defn startup [delay]
   (let [raphael (.-Raphael js/window)
         new-paper (raphael "paper" 1920 1080)]
     (swap! paper (fn [_] new-paper))
-    (swap! data (fn [_] {:results #{}}))
+    (swap! data (fn [_] {:delay (or delay 1000)
+                         :results #{}}))
     (init-intro!)
     ))
